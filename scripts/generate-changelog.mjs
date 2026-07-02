@@ -15,7 +15,7 @@
 //   DIFF_CHAR_LIMIT         -> máx. de caracteres de diff a enviar (default 24000).
 //   RELEASE_DATE            -> fecha YYYY-MM-DD (default: hoy en UTC).
 //   REPO                    -> "owner/repo" para armar la URL del instalador
-//                              (default "maxamo203/AgentsUsageObserver").
+//                              (default "Franco-Vallejos/AgentsUsageObserver").
 //
 // Si la llamada a GitHub Models falla o no devuelve JSON válido, cae a un
 // fallback que arma el changelog con los mensajes de commit crudos, de modo
@@ -30,7 +30,7 @@ const JSON_PATH = resolve(__dirname, '..', 'web', 'public', 'releases.json');
 
 const MODELS_ENDPOINT = 'https://models.github.ai/inference/chat/completions';
 const MODEL = process.env.GITHUB_MODELS_MODEL || 'openai/gpt-4o-mini';
-const REPO = process.env.REPO || 'maxamo203/AgentsUsageObserver';
+const REPO = process.env.REPO || 'Franco-Vallejos/AgentsUsageObserver';
 const DIFF_CHAR_LIMIT = Number(process.env.DIFF_CHAR_LIMIT) || 24000;
 const VALID_TYPES = new Set(['new', 'fix', 'change']);
 

@@ -1,10 +1,29 @@
 {
   "releases": [
     {
-      "version": "0.1.2",
+      "version": "0.1.3",
       "date": "2026-07-01",
       "current": true,
-      "installer": "https://github.com/maxamo203/AgentsUsageObserver/releases/download/v0.1.2/AgentUsageObserver-0.1.2-Setup.exe",
+      "installer": "https://github.com/Franco-Vallejos/AgentsUsageObserver/releases/download/v0.1.3/AgentUsageObserver-0.1.3-Setup.exe",
+      "changes": [
+        {
+          "type": "new",
+          "text": "Se agrego soporte para Codex junto al monitoreo existente de Claude Code."
+        },
+        {
+          "type": "change",
+          "text": "El panel y el tray ahora muestran varios agentes a la vez sin que un provider tape al otro."
+        },
+        {
+          "type": "change",
+          "text": "El icono y los textos publicos se ajustaron para una experiencia multi-agente mas clara."
+        }
+      ]
+    },
+    {
+      "version": "0.1.2",
+      "date": "2026-07-01",
+      "installer": "https://github.com/Franco-Vallejos/AgentsUsageObserver/releases/download/v0.1.2/AgentUsageObserver-0.1.2-Setup.exe",
       "changes": [
         {
           "type": "new",
@@ -23,7 +42,7 @@
     {
       "version": "0.1.1",
       "date": "2026-07-01",
-      "installer": "https://github.com/maxamo203/AgentsUsageObserver/releases/download/v0.1.1/AgentUsageObserver-0.1.1-Setup.exe",
+      "installer": "https://github.com/Franco-Vallejos/AgentsUsageObserver/releases/download/v0.1.1/AgentUsageObserver-0.1.1-Setup.exe",
       "changes": [
         {
           "type": "new",
@@ -42,7 +61,7 @@
     {
       "version": "0.1.0",
       "date": "2026-06-26",
-      "installer": "https://github.com/maxamo203/AgentsUsageObserver/releases/download/v0.1.0/AgentUsageObserver-0.1.0-Setup.exe",
+      "installer": "https://github.com/Franco-Vallejos/AgentsUsageObserver/releases/download/v0.1.0/AgentUsageObserver-0.1.0-Setup.exe",
       "changes": [
         {
           "type": "new",
