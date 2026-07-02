@@ -24,7 +24,7 @@ public sealed class UpdateService
 {
     // owner/repo del proyecto. La API de releases es pública (sin token).
     private const string LatestReleaseUrl =
-        "https://api.github.com/repos/maxamo203/AgentsUsageObserver/releases/latest";
+        "https://api.github.com/repos/Franco-Vallejos/AgentsUsageObserver/releases/latest";
 
     private readonly HttpClient _http;
     private readonly SettingsService _settings;
