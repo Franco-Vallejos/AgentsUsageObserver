@@ -2,7 +2,7 @@
 ; Requires Inno Setup 6.x — https://jrsoftware.org/isinfo.php
 
 #define AppName      "Agent Usage Observer"
-#define AppVersion   "0.1.0"
+#define AppVersion   "0.1.3"
 #define AppPublisher "maxamo"
 #define AppExeName   "AgentUsageObserver.exe"
 #define PublishDir   "AgentUsageObserver\bin\Release\net8.0-windows\win-x64\publish"
