@@ -4,16 +4,16 @@ import { currentRelease } from '../data/releases';
 
 <section id="download" class="cta">
   <div class="container box">
-    <h2>Descargalo y empezá a monitorear.</h2>
+    <h2>Descargalo y empeza a monitorear.</h2>
     <p>
-      Instalador para Windows 10 y 11. Instalás, lo abrís y queda monitoreando
-      en la bandeja del sistema.
+      Instalador para Windows 10 y 11. Instalas, lo abris y queda monitoreando
+      en la bandeja del sistema para Claude Code y Codex.
     </p>
     <a href={currentRelease.installer} class="btn btn-primary" download>
-      ⬇ Descargar v{currentRelease.version} para Windows
+      Descargar v{currentRelease.version} para Windows
     </a>
     <p class="note">
-      Empieza con Claude Code. Pronto, más agentes.
+      Multi-agente, refresco por proveedor y alertas visuales en una sola app.
     </p>
   </div>
 </section>
@@ -38,13 +38,5 @@ import { currentRelease } from '../data/releases';
     font-size: 14px;
     margin-top: 18px;
     margin-bottom: 0;
-  }
-  code {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 1px 6px;
-    font-size: 13px;
-    color: var(--text);
   }
 </style>

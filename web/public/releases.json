@@ -8,15 +8,15 @@
       "changes": [
         {
           "type": "new",
-          "text": "Se implementó un sistema de actualización automática que verifica si hay nuevas versiones disponibles al iniciar la aplicación."
+          "text": "Se agrego soporte para Codex junto al monitoreo existente de Claude Code."
         },
         {
           "type": "change",
-          "text": "Se añadió la opción en la configuración para habilitar o deshabilitar la búsqueda de actualizaciones al iniciar."
+          "text": "El panel y el tray ahora muestran varios agentes a la vez sin que un provider tape al otro."
         },
         {
-          "type": "new",
-          "text": "Se incorporaron mensajes en español para notificar al usuario sobre actualizaciones disponibles."
+          "type": "change",
+          "text": "El icono y los textos publicos se ajustaron para una experiencia multi-agente mas clara."
         }
       ]
     },
@@ -27,15 +27,15 @@
       "changes": [
         {
           "type": "new",
-          "text": "Se implementó un sistema de actualización automática que verifica si hay nuevas versiones disponibles al iniciar la aplicación."
+          "text": "Se implemento un sistema de actualizacion automatica que verifica si hay nuevas versiones disponibles al iniciar la aplicacion."
         },
         {
           "type": "change",
-          "text": "Se añadió la opción en la configuración para habilitar o deshabilitar la búsqueda de actualizaciones al iniciar."
+          "text": "Se anadio la opcion en la configuracion para habilitar o deshabilitar la busqueda de actualizaciones al iniciar."
         },
         {
           "type": "new",
-          "text": "Se incorporaron mensajes en español para notificar al usuario sobre actualizaciones disponibles."
+          "text": "Se incorporaron mensajes en espanol para notificar al usuario sobre actualizaciones disponibles."
         }
       ]
     },
@@ -46,19 +46,19 @@
       "changes": [
         {
           "type": "new",
-          "text": "Monitor de uso de agentes de IA desde la bandeja del sistema (empezando por Claude Code)."
+          "text": "Monitor de uso de agentes de IA desde la bandeja del sistema."
         },
         {
           "type": "new",
-          "text": "Botón de refresh junto al nombre de cada agente para actualizar solo su información."
+          "text": "Boton de refresh junto al nombre de cada agente para actualizar solo su informacion."
         },
         {
           "type": "new",
-          "text": "Icono de color según el consumo (verde / amarillo / rojo)."
+          "text": "Icono de color segun el consumo (verde / amarillo / rojo)."
         },
         {
           "type": "new",
-          "text": "Barras de límite de 5 horas y semanal con cuenta regresiva de reinicio."
+          "text": "Barras de limite de 5 horas y semanal con cuenta regresiva de reinicio."
         },
         {
           "type": "new",
@@ -66,15 +66,15 @@
         },
         {
           "type": "new",
-          "text": "Frecuencia de actualización ajustable."
+          "text": "Frecuencia de actualizacion ajustable."
         },
         {
           "type": "new",
-          "text": "Opción de iniciar con Windows."
+          "text": "Opcion de iniciar con Windows."
         },
         {
           "type": "new",
-          "text": "Soporte multi-idioma (inglés, español, portugués y más)."
+          "text": "Soporte multi-idioma (ingles, espanol, portugues y mas)."
         }
       ]
     }

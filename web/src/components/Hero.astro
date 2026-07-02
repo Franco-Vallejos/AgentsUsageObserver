@@ -13,60 +13,84 @@ const logo = asset("logo.png");
         <span>Agent Usage Observer</span>
       </div>
       <p class="eyebrow">Para Windows · Agentes de IA</p>
-      <h1>Mira cuánto te queda de tus agentes, sin abrir nada.</h1>
+      <h1>Mira cuanto te queda de tus agentes, sin abrir nada.</h1>
       <p class="lead">
-        Agent Usage Observer vive en la bandeja del sistema y te muestra tu uso
-        de los límites de 5 horas y semanal de un vistazo. Empieza con Claude
-        Code y sumará otros agentes —como Gemini y ChatGPT/Codex— más adelante.
+        Agent Usage Observer vive en la bandeja del sistema y te muestra de un vistazo
+        el uso de Claude Code y Codex, con ventanas de 5 horas y semanal,
+        refresco por agente y alertas visuales antes de pegar contra el limite.
       </p>
       <div class="actions">
         <a href={currentRelease.installer} class="btn btn-primary" download>
-          ⬇ Descargar para Windows
+          Descargar para Windows
         </a>
         <a href="#versions" class="btn btn-ghost">Ver versiones</a>
       </div>
       <p class="meta">
-        Versión {currentRelease.version} · Para Windows 10 y 11
+        Version {currentRelease.version} · Para Windows 10 y 11
       </p>
     </div>
 
     <div class="mock" aria-hidden="true">
       <div class="panel">
-        <div class="panel-head">
-          <strong>Claude</strong>
-          <span class="dot"></span>
-          <button class="refresh" title="Actualizar" aria-label="Actualizar">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M 12 4 A 5 5 0 1 0 13 7.5"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"></path>
-              <path d="M 9.2 3.6 L 12.4 3.8 L 11.6 7 Z" fill="currentColor"
-              ></path>
-            </svg>
-          </button>
+        <div class="agent-block">
+          <div class="panel-head">
+            <strong>Codex</strong>
+            <span class="dot dot-yellow"></span>
+            <button class="refresh" title="Actualizar" aria-label="Actualizar">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M 12 4 A 5 5 0 1 0 13 7.5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"></path>
+                <path d="M 9.2 3.6 L 12.4 3.8 L 11.6 7 Z" fill="currentColor"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-label"><span>Ultimas 5h</span><span>68%</span></div>
+            <div class="track">
+              <i style="width:68%;background:var(--yellow)"></i>
+            </div>
+            <div class="reset">Reinicia en 1h 24m</div>
+          </div>
+
+          <div class="bar-row compact">
+            <div class="bar-label"><span>Semana</span><span>19%</span></div>
+            <div class="track">
+              <i style="width:19%;background:var(--green)"></i>
+            </div>
+          </div>
         </div>
 
-        <div class="bar-row">
-          <div class="bar-label"><span>Últimas 5h</span><span>42%</span></div>
-          <div class="track">
-            <i style="width:42%;background:var(--green)"></i>
-          </div>
-          <div class="reset">Reinicia en 4h 51m</div>
-        </div>
+        <div class="divider"></div>
 
-        <div class="bar-row">
-          <div class="bar-label"><span>Semana</span><span>78%</span></div>
-          <div class="track">
-            <i style="width:78%;background:var(--yellow)"></i>
+        <div class="agent-block">
+          <div class="panel-head">
+            <strong>Claude</strong>
+            <span class="dot dot-green"></span>
           </div>
-          <div class="reset">Reinicia en 3d 19h</div>
+
+          <div class="bar-row">
+            <div class="bar-label"><span>Ultimas 5h</span><span>42%</span></div>
+            <div class="track">
+              <i style="width:42%;background:var(--green)"></i>
+            </div>
+            <div class="reset">Reinicia en 4h 51m</div>
+          </div>
+
+          <div class="bar-row compact">
+            <div class="bar-label"><span>Semana</span><span>78%</span></div>
+            <div class="track">
+              <i style="width:78%;background:var(--yellow)"></i>
+            </div>
+          </div>
         </div>
 
         <div class="panel-foot">
           <span class="muted">Actualizado 14:02:31</span>
-          <span class="link">Abrir configuración ⚙</span>
+          <span class="link">Abrir configuracion</span>
         </div>
       </div>
     </div>
@@ -101,7 +125,7 @@ const logo = asset("logo.png");
     font-size: 18px;
     color: var(--muted);
     margin: 20px 0 28px;
-    max-width: 46ch;
+    max-width: 48ch;
   }
   .actions {
     display: flex;
@@ -113,14 +137,20 @@ const logo = asset("logo.png");
     font-size: 13px;
     color: var(--muted);
   }
-
-  /* Maqueta del mini panel */
   .panel {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 20px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .agent-block + .agent-block {
+    margin-top: 16px;
+  }
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 16px 0;
   }
   .panel-head {
     display: flex;
@@ -130,11 +160,6 @@ const logo = asset("logo.png");
   }
   .panel-head strong {
     font-size: 15px;
-  }
-  .panel-head .status {
-    margin-left: auto;
-    color: var(--muted);
-    font-size: 12px;
   }
   .refresh {
     display: inline-flex;
@@ -165,7 +190,12 @@ const logo = asset("logo.png");
     width: 10px;
     height: 10px;
     border-radius: 50%;
+  }
+  .dot-green {
     background: var(--green);
+  }
+  .dot-yellow {
+    background: var(--yellow);
   }
   .muted {
     color: var(--muted);
@@ -173,6 +203,9 @@ const logo = asset("logo.png");
   }
   .bar-row {
     margin-bottom: 18px;
+  }
+  .bar-row.compact {
+    margin-bottom: 0;
   }
   .bar-label {
     display: flex;
@@ -200,7 +233,7 @@ const logo = asset("logo.png");
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 14px;
+    margin-top: 16px;
   }
   .panel-foot .link {
     color: var(--blue);
