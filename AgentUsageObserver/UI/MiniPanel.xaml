@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:AgentUsageObserver.Services.Localization"
-        Title="Claude Usage"
-        Width="300"
+        Title="Agent Usage"
+        Width="330"
         SizeToContent="Height"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -21,91 +21,18 @@
             <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.45" Color="Black"/>
         </Border.Effect>
         <StackPanel>
-            <!-- Encabezado: nombre del agente + refresh + estado -->
-            <Grid Margin="0,0,0,12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <TextBlock Text="{loc:Tr AppName}"
+                       Foreground="White"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,12"/>
 
-                <TextBlock x:Name="ProviderNameText"
-                           Grid.Column="0"
-                           Text="Agent"
-                           Foreground="White"
-                           FontSize="15"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"/>
+            <ScrollViewer MaxHeight="520"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="ProvidersHost"/>
+            </ScrollViewer>
 
-                <!-- Botón de refresh de este agente -->
-                <Button x:Name="RefreshButton"
-                        Grid.Column="1"
-                        Width="22" Height="22"
-                        Margin="8,0,0,0"
-                        Padding="0"
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        ToolTip="{loc:Tr MenuRefreshNow}"
-                        Click="OnRefreshClick">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="bg"
-                                    CornerRadius="6"
-                                    Background="Transparent">
-                                <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="bg" Property="Background" Value="#2A2C34"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                    <!-- Glifo de refresh dibujado con Canvas (no depende de fuentes) -->
-                    <Canvas Width="16" Height="16"
-                            RenderTransformOrigin="0.5,0.5">
-                        <!-- Arco: solo trazo, sin relleno -->
-                        <Path Stroke="#9AA0AA"
-                              StrokeThickness="1.6"
-                              StrokeStartLineCap="Round"
-                              StrokeEndLineCap="Round"
-                              Data="M 12.2 4.6 A 5 5 0 1 0 13 8"/>
-                        <!-- Punta de flecha rellena -->
-                        <Path Fill="#9AA0AA"
-                              Data="M 9 3 L 13 3 L 13 7 Z"/>
-                        <Canvas.RenderTransform>
-                            <RotateTransform x:Name="RefreshRotate" Angle="0"/>
-                        </Canvas.RenderTransform>
-                    </Canvas>
-                </Button>
-
-                <TextBlock x:Name="StatusText"
-                           Grid.Column="2"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center"
-                           Foreground="#9AA0AA"
-                           FontSize="11"/>
-            </Grid>
-
-            <!-- Cuerpo: mensaje de estado o las barras -->
-            <TextBlock x:Name="MessageText"
-                       Foreground="#C9CDD4"
-                       TextWrapping="Wrap"
-                       FontSize="12"
-                       Visibility="Collapsed"
-                       Margin="0,0,0,8"/>
-
-            <StackPanel x:Name="BarsHost"/>
-
-            <!-- Pie -->
             <Grid Margin="0,12,0,0">
-                <TextBlock x:Name="UpdatedText"
-                           Foreground="#6E7681"
-                           FontSize="10"
-                           VerticalAlignment="Center"/>
                 <TextBlock Text="{loc:Tr OpenSettingsLink}"
                            x:Name="OpenSettingsLink"
                            HorizontalAlignment="Right"

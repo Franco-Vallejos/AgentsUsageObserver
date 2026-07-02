@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using AgentUsageObserver.Models;
@@ -11,11 +13,11 @@ using H.NotifyIcon;
 namespace AgentUsageObserver.Tray;
 
 /// <summary>
-/// Dueño del icono del tray y de la interacción:
-///  - Clic simple  → muestra/oculta el MiniPanel.
-///  - Doble clic    → abre la ventana de configuración.
-///  - Clic derecho  → menú contextual (Configuración / Salir).
-/// Actualiza el icono dibujado y el tooltip con cada snapshot recibido.
+/// Owns the tray icon and interaction:
+///  - single click toggles the mini panel
+///  - double click opens settings
+///  - right click opens the context menu
+/// Keeps one snapshot per provider so multiple agents can coexist.
 /// </summary>
 public sealed class TrayController : IDisposable
 {
@@ -23,11 +25,11 @@ public sealed class TrayController : IDisposable
     private readonly SettingsService _settings;
     private readonly PollingService _polling;
     private readonly DispatcherTimer _clickTimer;
+    private readonly Dictionary<string, UsageSnapshot> _snapshots = new();
 
     private MiniPanel? _miniPanel;
     private MainWindow? _mainWindow;
     private Icon? _currentIcon;
-    private UsageSnapshot? _lastSnapshot;
     private bool _doubleClickPending;
 
     public TrayController(SettingsService settings, PollingService polling)
@@ -37,7 +39,6 @@ public sealed class TrayController : IDisposable
 
         _icon = new TaskbarIcon
         {
-            // Id estable → Windows registra y persiste la posición/visibilidad del icono.
             Id = new Guid("8E0F7A12-BFB3-4FE8-B9A5-48FD50A15A9A"),
             ToolTipText = Loc.T(Str.AppName),
             Visibility = Visibility.Visible
@@ -46,35 +47,29 @@ public sealed class TrayController : IDisposable
         _icon.TrayMouseDoubleClick += OnDoubleClick;
         _icon.ContextMenu = BuildContextMenu();
 
-        // Distingue clic simple de doble clic: esperamos el doble-click time del sistema.
         _clickTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime())
         };
         _clickTimer.Tick += OnSingleClickConfirmed;
 
-        UpdateIcon(null); // estado inicial "cargando"
+        UpdateIcon(null);
 
-        // Garantiza que el icono se cree de inmediato (sin esperar al primer render WPF).
-        try { _icon.ForceCreate(); } catch { /* algunos entornos no lo soportan */ }
+        try { _icon.ForceCreate(); } catch { }
 
-        // Aviso de arranque para confirmar que está vivo (aparece aunque el icono esté en el overflow).
         try
         {
             _icon.ShowNotification(
                 title: Loc.T(Str.TrayStartupTitle),
                 message: Loc.T(Str.TrayStartupMessage));
         }
-        catch { /* notificaciones deshabilitadas */ }
+        catch { }
 
         _polling.Updated += OnUsageUpdated;
     }
 
-    // ---- Eventos del tray ----
-
     private void OnLeftClick(object sender, RoutedEventArgs e)
     {
-        // Arrancamos el timer; si llega un doble clic antes de que dispare, se cancela.
         _doubleClickPending = false;
         _clickTimer.Stop();
         _clickTimer.Start();
@@ -83,7 +78,12 @@ public sealed class TrayController : IDisposable
     private void OnSingleClickConfirmed(object? sender, EventArgs e)
     {
         _clickTimer.Stop();
-        if (_doubleClickPending) { _doubleClickPending = false; return; }
+        if (_doubleClickPending)
+        {
+            _doubleClickPending = false;
+            return;
+        }
+
         ToggleMiniPanel();
     }
 
@@ -95,13 +95,11 @@ public sealed class TrayController : IDisposable
         ShowMainWindow();
     }
 
-    // ---- Actualización de uso ----
-
     private void OnUsageUpdated(UsageSnapshot snapshot)
     {
-        _lastSnapshot = snapshot;
-        UpdateIcon(snapshot);
-        _miniPanel?.Update(snapshot);
+        _snapshots[snapshot.ProviderId] = snapshot;
+        UpdateIcon(PrimarySnapshot());
+        _miniPanel?.Update(SnapshotsOrdered(), snapshot.ProviderId);
     }
 
     private void UpdateIcon(UsageSnapshot? snapshot)
@@ -110,22 +108,38 @@ public sealed class TrayController : IDisposable
         _icon.Icon = newIcon;
         _currentIcon?.Dispose();
         _currentIcon = newIcon;
-        _icon.ToolTipText = BuildTooltip(snapshot);
+        _icon.ToolTipText = BuildTooltip(_snapshots.Values);
     }
 
-    private static string BuildTooltip(UsageSnapshot? s)
+    private static string BuildTooltip(IEnumerable<UsageSnapshot> snapshots)
     {
-        if (s is null) return Loc.T(Str.TooltipLoading);
-        if (s.Status == UsageStatus.NotAuthenticated) return Loc.T(Str.TooltipNoSession);
-        if (s.Status == UsageStatus.Error && s.FiveHour is null) return Loc.T(Str.TooltipNoConnection);
+        var ordered = snapshots
+            .OrderBy(s => s.ProviderName, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
 
-        string fh = s.FiveHour is { } a ? Loc.T(Str.TooltipFiveHour, $"{a.Percent:0}") : Loc.T(Str.TooltipFiveHourEmpty);
-        string wk = s.SevenDay is { } b ? Loc.T(Str.TooltipWeek, $"{b.Percent:0}") : Loc.T(Str.TooltipWeekEmpty);
-        string suffix = s.Status == UsageStatus.RateLimited ? Loc.T(Str.TooltipWaiting) : "";
-        return $"{s.ProviderName} · {fh} · {wk}{suffix}";
+        if (ordered.Count == 0)
+            return Loc.T(Str.TooltipLoading);
+
+        return string.Join(Environment.NewLine, ordered.Select(FormatTooltipLine));
     }
 
-    // ---- MiniPanel ----
+    private static string FormatTooltipLine(UsageSnapshot snapshot)
+    {
+        if (snapshot.Status == UsageStatus.NotAuthenticated)
+            return $"{snapshot.ProviderName} - {Loc.T(Str.StatusNoSession)}";
+
+        if (snapshot.Status == UsageStatus.Error && snapshot.FiveHour is null)
+            return $"{snapshot.ProviderName} - {Loc.T(Str.StatusNoConnection)}";
+
+        string fiveHour = snapshot.FiveHour is { } fh
+            ? Loc.T(Str.TooltipFiveHour, $"{fh.Percent:0}")
+            : Loc.T(Str.TooltipFiveHourEmpty);
+        string week = snapshot.SevenDay is { } wk
+            ? Loc.T(Str.TooltipWeek, $"{wk.Percent:0}")
+            : Loc.T(Str.TooltipWeekEmpty);
+        string suffix = snapshot.Status == UsageStatus.RateLimited ? Loc.T(Str.TooltipWaiting) : "";
+        return $"{snapshot.ProviderName} - {fiveHour} - {week}{suffix}";
+    }
 
     private void ToggleMiniPanel()
     {
@@ -138,18 +152,14 @@ public sealed class TrayController : IDisposable
     private void ShowMiniPanel()
     {
         _miniPanel ??= new MiniPanel(() => ShowMainWindow(), id => _polling.PollProvider(id));
-        if (_lastSnapshot is not null) _miniPanel.Update(_lastSnapshot);
+        _miniPanel.Update(SnapshotsOrdered());
         _miniPanel.ShowNearTray();
 
-        // No pidas datos automáticamente al abrir si estamos limitados (429):
-        // esperamos a que pase el cooldown. El usuario puede forzar con el botón de refresh.
-        if (_lastSnapshot?.Status != UsageStatus.RateLimited)
-            _polling.PollNow(); // datos frescos al abrir
+        if (_snapshots.Values.All(snapshot => snapshot.Status != UsageStatus.RateLimited))
+            _polling.PollNow();
     }
 
     private void HideMiniPanel() => _miniPanel?.HidePanel();
-
-    // ---- MainWindow (configuración) ----
 
     private void ShowMainWindow()
     {
@@ -158,13 +168,12 @@ public sealed class TrayController : IDisposable
             _mainWindow = new MainWindow(_settings);
             _mainWindow.Closed += (_, _) => _mainWindow = null;
         }
+
         _mainWindow.Show();
         _mainWindow.Activate();
         if (_mainWindow.WindowState == WindowState.Minimized)
             _mainWindow.WindowState = WindowState.Normal;
     }
-
-    // ---- Menú contextual ----
 
     private System.Windows.Controls.ContextMenu BuildContextMenu()
     {
@@ -184,6 +193,32 @@ public sealed class TrayController : IDisposable
         menu.Items.Add(new System.Windows.Controls.Separator());
         menu.Items.Add(exitItem);
         return menu;
+    }
+
+    private IReadOnlyList<UsageSnapshot> SnapshotsOrdered() =>
+        _snapshots.Values
+            .OrderBy(snapshot => snapshot.ProviderName, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+    private UsageSnapshot? PrimarySnapshot() =>
+        _snapshots.Values
+            .OrderByDescending(SnapshotPriority)
+            .ThenBy(snapshot => snapshot.ProviderName, StringComparer.CurrentCultureIgnoreCase)
+            .FirstOrDefault();
+
+    private static int SnapshotPriority(UsageSnapshot snapshot)
+    {
+        var severity = snapshot.FiveHour?.Severity
+            ?? snapshot.Windows.FirstOrDefault()?.Severity
+            ?? UsageSeverity.Unknown;
+
+        if (severity == UsageSeverity.Critical) return 40;
+        if (severity == UsageSeverity.Warning) return 30;
+        if (severity == UsageSeverity.Normal) return 20;
+        if (snapshot.Status == UsageStatus.RateLimited) return 15;
+        if (snapshot.Status == UsageStatus.Error) return 10;
+        if (snapshot.Status == UsageStatus.NotAuthenticated) return 5;
+        return 0;
     }
 
     private static int GetDoubleClickTime()
