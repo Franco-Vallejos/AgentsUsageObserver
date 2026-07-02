@@ -46,9 +46,7 @@ public partial class MiniPanel : Window
         else
             _spinningProviders.Clear();
 
-        var ordered = snapshots
-            .OrderBy(s => s.ProviderName, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+        var ordered = snapshots.ToList();
 
         _refreshRotates.Clear();
         ProvidersHost.Children.Clear();

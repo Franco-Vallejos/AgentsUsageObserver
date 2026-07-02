@@ -113,9 +113,7 @@ public sealed class TrayController : IDisposable
 
     private static string BuildTooltip(IEnumerable<UsageSnapshot> snapshots)
     {
-        var ordered = snapshots
-            .OrderBy(s => s.ProviderName, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+        var ordered = OrderSnapshots(snapshots).ToList();
 
         if (ordered.Count == 0)
             return Loc.T(Str.TooltipLoading);
@@ -196,15 +194,16 @@ public sealed class TrayController : IDisposable
     }
 
     private IReadOnlyList<UsageSnapshot> SnapshotsOrdered() =>
-        _snapshots.Values
-            .OrderBy(snapshot => snapshot.ProviderName, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+        OrderSnapshots(_snapshots.Values).ToList();
 
     private UsageSnapshot? PrimarySnapshot() =>
-        _snapshots.Values
+        OrderSnapshots(_snapshots.Values).FirstOrDefault();
+
+    private static IOrderedEnumerable<UsageSnapshot> OrderSnapshots(IEnumerable<UsageSnapshot> snapshots) =>
+        snapshots
             .OrderByDescending(SnapshotPriority)
-            .ThenBy(snapshot => snapshot.ProviderName, StringComparer.CurrentCultureIgnoreCase)
-            .FirstOrDefault();
+            .ThenByDescending(snapshot => snapshot.RetrievedAt)
+            .ThenBy(snapshot => snapshot.ProviderName, StringComparer.CurrentCultureIgnoreCase);
 
     private static int SnapshotPriority(UsageSnapshot snapshot)
     {
